@@ -12,7 +12,7 @@ const initialState = {
 }
 
 export default function AdminPage() {
-    const [state, formAction, isPending] = useActionState(loginAction, initialState)
+    const [, formAction, isPending] = useActionState(loginAction, initialState)
 
     return (
         <form action={formAction} className="m-8 flex max-w-sm flex-col gap-3">

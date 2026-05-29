@@ -1,241 +1,99 @@
-import Link from "next/link";
+import { NewsletterForm } from "./components/NewsletterForm";
+import { PageShell } from "./components/SiteShell";
+import { getApiData, getAssetUrl, type ContentSection } from "./lib/api";
 
-type Asset = {
-  url?: string;
-};
-
-type Section = {
-  id: number | string;
-  title: string;
-  content: string;
-  asset?: Asset;
-};
-
-type Animal = {
-  id: number | string;
-  name: string;
-  description: string;
-  age?: number;
-  asset?: Asset;
-};
-
-async function getApiData<T>(path: string): Promise<T[]> {
-  try {
-    const response = await fetch(`http://localhost:4000/api/v1/${path}`, {
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return [];
-    }
-
-    return response.json();
-  } catch {
-    return [];
-  }
-}
-
-function ApiImage({
-  src,
-  alt,
-  className,
-}: {
-  src?: string;
-  alt: string;
-  className: string;
-}) {
-  if (!src) {
-    return (
-      <div
-        className={`${className} flex items-center justify-center bg-[#d9d1c2] text-sm font-medium text-[#5d6358]`}
-      >
-        Intet billede
-      </div>
-    );
-  }
-
-  return <img src={src} alt={alt} className={className} />;
-}
+const fallbackAbouts: ContentSection[] = [
+  {
+    id: "fallback-1",
+    title: "Om os",
+    content:
+      "Vi kæmper for at nedbringe antallet af dyr i nød og sikre, at alle nødstedte dyr får den rette hjælp. Vi arbejder med et landsdækkende netværk af frivillige, internater og plejestationer, der hver dag hjælper dyr.",
+  },
+  {
+    id: "fallback-2",
+    title: "Dyr & Mennesker",
+    content:
+      "Dyr er en vigtig del af vores liv og samfundet, og styrker vores sociale relationer. Med dyr følger ansvar, derfor arbejder vi proaktivt med oplysning om ansvarligt ejerskab.",
+  },
+  {
+    id: "fallback-3",
+    title: "Mad & Forbrug",
+    content:
+      "Vi kæmper for et mere naturligt fødevareforbrug og en bæredygtig produktion med fokus på kvalitet, omtanke og respekt for dyr og natur.",
+  },
+];
 
 export default async function Home() {
-  const [adoptSections, abouts, animals, volunteers] = await Promise.all([
-    getApiData<Section>("adoptsections"),
-    getApiData<Section>("abouts"),
-    getApiData<Animal>("animals"),
-    getApiData<Section>("volunteers"),
+  const [abouts, adoptSections] = await Promise.all([
+    getApiData<ContentSection>("abouts"),
+    getApiData<ContentSection>("adoptsections"),
   ]);
-
-  const hero = adoptSections[0];
-  const volunteer = volunteers[0];
+  const visibleAbouts = abouts.length > 0 ? abouts.slice(0, 3) : fallbackAbouts;
+  const heroImage = getAssetUrl(adoptSections[0]?.asset?.url);
+  const emergencyImage = getAssetUrl(
+    adoptSections[1]?.asset?.url ?? adoptSections[0]?.asset?.url,
+  );
 
   return (
-    <main className="min-h-screen bg-[#f6f3ed] text-[#1f261f]">
-      <header className="bg-white">
-        <nav className="mx-auto flex h-[100px] max-w-6xl items-center justify-between px-5 text-[#1f261f] sm:px-8">
-          <Link className="text-sm font-bold uppercase tracking-[0.18em]" href="/">
-            Dyrevelfærd
-          </Link>
-          <div className="hidden items-center gap-7 text-sm font-medium sm:flex">
-            <a href="#adopter">Adopter</a>
-            <a href="#dyr">Dyr</a>
-            <a href="#om">Om os</a>
-            <Link href="/admin">Admin</Link>
-          </div>
-        </nav>
-      </header>
-
-      <section id="adopter" className="relative h-[360px] overflow-hidden bg-[#172018] text-white">
-        <ApiImage
-          src={hero?.asset?.url}
-          alt={hero?.title ?? "Dyrevelfærd"}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 mx-auto flex h-full max-w-6xl items-center px-5 sm:px-8">
-          <div className="max-w-2xl">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-[#dce9c8]">
-              Foreningen for dyrevelfærd
-            </p>
-            <h1 className="text-4xl font-bold leading-[1.05] sm:text-6xl">
-              {hero?.title ?? "Adopter et dyr"}
+    <PageShell>
+      <main>
+        <section
+          className="relative mx-auto flex h-[154px] max-w-[1400px] items-center overflow-hidden bg-[#7f877f] bg-cover bg-center px-8 text-white sm:h-[240px] sm:px-28"
+          style={heroImage ? { backgroundImage: `url(${heroImage})` } : undefined}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/15 to-transparent" />
+          <div className="relative">
+            <h1 className="font-oswald text-3xl font-normal leading-tight [text-shadow:0_3px_8px_rgba(0,0,0,0.55)] sm:text-6xl">
+              Foreningen for Dyrevelfærd
             </h1>
-            <p className="mt-4 max-w-xl text-lg font-semibold leading-7 text-white/88">
-              {hero?.content ??
-                "Overvejer du et nyt medlem af familien? Måske du er det perfekte match til et dyr, der venter på et nyt kærligt hjem."}
+            <p className="mt-2 font-oswald text-lg font-medium leading-tight [text-shadow:0_3px_8px_rgba(0,0,0,0.55)] sm:text-3xl">
+              Vi specialiserer os i dyrevelfærd
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <a
-                className="inline-flex h-12 items-center justify-center rounded-full bg-[#d8ef8f] px-6 text-sm font-bold text-[#1f261f] transition hover:bg-[#c7e676]"
-                href="#dyr"
-              >
-                Se dyr
-              </a>
-              <a
-                className="inline-flex h-12 items-center justify-center rounded-full border border-white/60 px-6 text-sm font-bold text-white transition hover:bg-white/12"
-                href="#frivillig"
-              >
-                Bliv frivillig
-              </a>
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="om" className="mx-auto max-w-6xl px-5 py-16 sm:px-8 lg:py-24">
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#61724c]">
-            Om foreningen
-          </p>
-          <h2 className="mt-3 text-4xl font-bold leading-tight">
-            Vi arbejder for bedre forhold for dyr.
-          </h2>
-        </div>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          {abouts.length > 0 ? (
-            abouts.slice(0, 3).map((about) => (
-              <article className="border-l border-[#c8c0af] pl-5" key={about.id}>
-                <h3 className="text-xl font-bold">{about.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-[#5d6358]">
-                  {about.content}
-                </p>
+        <section id="om" className="mx-auto max-w-[1400px] px-5 py-14 sm:px-8 sm:py-16">
+          <div className="grid gap-9 md:grid-cols-3">
+            {visibleAbouts.map((about) => (
+              <article key={about.id}>
+                <h2 className="font-oswald text-2xl font-bold text-[#365b91]">
+                  {about.title}
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-[#111]">{about.content}</p>
               </article>
-            ))
-          ) : (
-            <p className="text-[#5d6358]">Ingen om os-tekster kunne hentes fra API'et.</p>
-          )}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
 
-      <section id="dyr" className="bg-white py-16 lg:py-24">
-        <div className="mx-auto max-w-6xl px-5 sm:px-8">
-          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <section className="bg-[#dce8f5] px-5 py-12 sm:px-8">
+          <div className="mx-auto grid max-w-[1400px] gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-center">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#61724c]">
-                Dyr
+              <h2 className="font-oswald text-3xl font-bold text-[#365b91]">
+                Tilmeld dig vores nyhedsbrev
+              </h2>
+              <p className="mt-2 text-sm font-semibold">
+                Få inspiration og nyheder om dyrevelfærd og vores arbejde, direkte i din indbakke.
               </p>
-              <h2 className="mt-3 text-4xl font-bold">Dyr der søger hjem</h2>
             </div>
-            <Link
-              className="text-sm font-bold text-[#43522f] underline underline-offset-4"
-              href="/admin"
-            >
-              Administrer dyr
-            </Link>
+            <NewsletterForm compact />
           </div>
+        </section>
 
-          {animals.length > 0 ? (
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
-              {animals.map((animal) => (
-                <article
-                  className="overflow-hidden rounded-lg border border-[#e7e0d2] bg-[#fbfaf7]"
-                  key={animal.id}
-                >
-                  <div className="aspect-[4/3]">
-                    <ApiImage
-                      src={animal.asset?.url}
-                      alt={animal.name}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="p-5">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#6b7d4f]">
-                      {animal.age ? `${animal.age} år` : "Adoption"}
-                    </p>
-                    <h3 className="mt-2 text-xl font-bold">{animal.name}</h3>
-                    <p className="mt-3 text-sm leading-6 text-[#5d6358]">
-                      {animal.description}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="mt-10 rounded-lg border border-[#e7e0d2] bg-[#fbfaf7] p-8 text-[#5d6358]">
-              Ingen dyr kunne hentes fra API'et lige nu.
-            </div>
-          )}
-        </div>
-      </section>
-
-      <section
-        id="frivillig"
-        className="mx-auto grid max-w-6xl gap-10 px-5 py-16 sm:px-8 lg:grid-cols-2 lg:py-24"
-      >
-        <div className="min-h-[360px] overflow-hidden rounded-lg">
-          <ApiImage
-            src={volunteer?.asset?.url}
-            alt={volunteer?.title ?? "Frivillige"}
-            className="h-full min-h-[360px] w-full object-cover"
-          />
-        </div>
-        <div className="flex flex-col justify-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#61724c]">
-            Frivillig
-          </p>
-          <h2 className="mt-3 text-4xl font-bold leading-tight">
-            {volunteer?.title ?? "Bliv frivillig"}
-          </h2>
-          <p className="mt-5 text-lg leading-8 text-[#5d6358]">
-            {volunteer?.content ??
-              "Hjælp med pleje, transport og praktiske opgaver for dyr, der har brug for en ny chance."}
-          </p>
-        </div>
-      </section>
-
-      <footer className="bg-[#1f261f] px-5 py-10 text-white sm:px-8">
-        <div className="mx-auto flex max-w-6xl flex-col justify-between gap-6 sm:flex-row sm:items-center">
-          <div>
-            <p className="font-bold">Foreningen for dyrevelfærd</p>
-            <p className="mt-1 text-sm text-white/70">Data hentes fra localhost:4000</p>
+        <section
+          className="relative mx-auto flex h-[155px] max-w-[1400px] items-center overflow-hidden bg-[#6f7168] bg-cover bg-center px-8 text-white sm:h-[245px] sm:px-28"
+          style={emergencyImage ? { backgroundImage: `url(${emergencyImage})` } : undefined}
+        >
+          <div className="absolute inset-0 bg-black/35" />
+          <div className="relative">
+            <h2 className="font-oswald text-3xl font-normal uppercase leading-tight [text-shadow:0_3px_8px_rgba(0,0,0,0.55)] sm:text-5xl">
+              Står du med et dyr i nød?
+            </h2>
+            <p className="mt-2 font-oswald text-base font-medium [text-shadow:0_3px_8px_rgba(0,0,0,0.55)] sm:text-xl">
+              Ring til Dyrenes Vagtcentral på 1812 og få råd og hjælp og håndtering af dyr.
+            </p>
           </div>
-          <Link
-            className="inline-flex h-11 items-center justify-center rounded-full bg-white px-5 text-sm font-bold text-[#1f261f]"
-            href="/admin"
-          >
-            Admin login
-          </Link>
-        </div>
-      </footer>
-    </main>
+        </section>
+      </main>
+    </PageShell>
   );
 }
