@@ -37,7 +37,7 @@ export function SiteFooter() {
             Kontakt
           </h2>
           <address className="mt-3 not-italic text-sm font-semibold leading-6">
-            Tovesvej 22, 1.
+            Tovesøvej 22, 1.
             <br />
             1131 København K
             <br />
@@ -51,10 +51,10 @@ export function SiteFooter() {
             Partnere
           </h2>
           <ul className="mt-3 space-y-1 text-sm font-semibold text-[#1265a8]">
-            <li>Alma</li>
-            <li>World Animal Protection</li>
-            <li>Fødevarestyrelsen</li>
-            <li>Faktalink</li>
+             <li className="cursor-pointer hover:underline">Anima</li>
+            <li className="cursor-pointer hover:underline">World Animal Protection</li>
+            <li className="cursor-pointer hover:underline">Fødevarestyrelsen</li>
+            <li className="cursor-pointer hover:underline">Faktalink</li>
           </ul>
         </section>
       </div>
