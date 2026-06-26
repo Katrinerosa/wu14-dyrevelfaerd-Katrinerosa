@@ -2,8 +2,9 @@
 
 import { useActionState } from "react"
 import { loginAction } from "./action"
+import type { LoginState } from "./action"
 
-const initialState = {
+const initialState: LoginState = {
     values: {
         username: "",
         password: "",

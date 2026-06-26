@@ -19,6 +19,7 @@ export type Animal = {
   gender?: string;
   race?: string;
   species?: string;
+  assetId?: number | string;
   asset?: Asset;
 };
 

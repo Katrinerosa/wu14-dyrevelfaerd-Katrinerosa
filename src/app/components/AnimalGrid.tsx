@@ -28,7 +28,7 @@ export function AnimalGrid({ animals, initialCount = 6 }: AnimalGridProps) {
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {visibleAnimals.map((animal) => (
           <article className="border border-[#d7d7d7] bg-white" key={animal.id}>
-            <div className="aspect-[4/3] overflow-hidden">
+            <div className="h-48 overflow-hidden bg-[#f0f0f0] sm:h-56">
               <ApiImage
                 alt={animal.name}
                 className="h-full w-full object-cover"
